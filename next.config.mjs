@@ -11,9 +11,9 @@ const nextConfig = {
     unoptimized: true,
   },
   allowedDevOrigins: [
-    'http://192.168.*',
-    'http://10.*',
-    'http://172.16.*',
+    'http://192.168.120.175:3000',
+    'http://192.168.120.175:3001',
+    '192.168.120.175',
   ],
   turbopack: {
     root: __dirname,

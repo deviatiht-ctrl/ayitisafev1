@@ -9,13 +9,13 @@ import RootNavigator from './src/navigation/RootNavigator';
 import { useAppStore } from './src/store/appStore';
 
 // Keep splash screen visible while loading fonts
-SplashScreen.preventAutoHideAsync();
+SplashScreen.preventAutoHideAsync().catch(() => {});
 
 export default function App() {
   const [appIsReady, setAppIsReady] = useState(false);
   const { isCamouflageActive } = useAppStore();
 
-  const [fontsLoaded] = useFonts({
+  const [fontsLoaded, fontError] = useFonts({
     Poppins_400Regular,
     Poppins_500Medium,
     Poppins_600SemiBold,
@@ -25,7 +25,6 @@ export default function App() {
   useEffect(() => {
     async function prepare() {
       try {
-        // Pre-load any other resources here
         await new Promise(resolve => setTimeout(resolve, 500));
       } catch (e) {
         console.warn(e);
@@ -37,13 +36,24 @@ export default function App() {
     prepare();
   }, []);
 
-  const onLayoutRootView = useCallback(async () => {
-    if (appIsReady && fontsLoaded) {
-      await SplashScreen.hideAsync();
+  // Also proceed if there's a font error (use system fonts as fallback)
+  useEffect(() => {
+    if (fontError) {
+      console.warn('Font loading error:', fontError);
     }
-  }, [appIsReady, fontsLoaded]);
+  }, [fontError]);
 
-  if (!appIsReady || !fontsLoaded) {
+  const onLayoutRootView = useCallback(async () => {
+    if (appIsReady && (fontsLoaded || fontError)) {
+      try {
+        await SplashScreen.hideAsync();
+      } catch (e) {
+        // ignore
+      }
+    }
+  }, [appIsReady, fontsLoaded, fontError]);
+
+  if (!appIsReady || (!fontsLoaded && !fontError)) {
     return null;
   }
 

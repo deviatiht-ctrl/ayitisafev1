@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { Poppins, Geist_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
+import { AuthGate } from '@/components/auth-gate'
 import './globals.css'
 
 const poppins = Poppins({
@@ -52,7 +53,7 @@ export default function RootLayout({
   return (
     <html lang="ht" suppressHydrationWarning>
       <body className={`${poppins.variable} ${geistMono.variable} font-sans antialiased`}>
-        {children}
+        <AuthGate>{children}</AuthGate>
         <Analytics />
       </body>
     </html>

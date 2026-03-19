@@ -4,10 +4,10 @@
     "slug": "ayitisafe",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/LOGO.jpg",
     "userInterfaceStyle": "automatic",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/LOGO.jpg",
       "resizeMode": "contain",
       "backgroundColor": "#1B2A4A"
     },
@@ -23,7 +23,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/LOGO.jpg",
         "backgroundColor": "#1B2A4A"
       },
       "package": "com.ayitisafe.app",
@@ -40,7 +40,8 @@
       "expo-location",
       "expo-image-picker",
       "expo-notifications",
-      "expo-secure-store"
+      "expo-secure-store",
+      "expo-font"
     ],
     "extra": {
       "eas": {

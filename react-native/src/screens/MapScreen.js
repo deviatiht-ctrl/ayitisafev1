@@ -9,7 +9,7 @@ import {
   Dimensions,
   Platform,
 } from 'react-native';
-import MapView, { Polygon, Polyline, Marker, PROVIDER_GOOGLE } from 'react-native-maps';
+import MapView, { Polygon, Polyline, Marker } from 'react-native-maps';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import * as Location from 'expo-location';
 import { BlurView } from 'expo-blur';
@@ -41,6 +41,7 @@ export default function MapScreen({ navigation }) {
   const { activeFilter, setActiveFilter, selectedZone, setSelectedZone, showAlertBanner, setShowAlertBanner } = useAppStore();
   const [showRoute, setShowRoute] = useState(false);
   const [userLocation, setUserLocation] = useState(null);
+  const [mapReady, setMapReady] = useState(false);
 
   useEffect(() => {
     // Animate to Port-au-Prince on mount
@@ -121,44 +122,48 @@ export default function MapScreen({ navigation }) {
       <MapView
         ref={mapRef}
         style={styles.map}
-        provider={Platform.OS === 'android' ? PROVIDER_GOOGLE : null}
         initialRegion={INITIAL_REGION}
         showsUserLocation
         showsMyLocationButton={false}
         showsCompass
         showsBuildings
-        showsTraffic
         mapType="standard"
+        onMapReady={() => setMapReady(true)}
       >
         {/* Zone Polygons */}
-        {filteredZones.map((zone) => (
-          <Polygon
-            key={zone.id}
-            coordinates={zone.coordinates}
-            fillColor={`${zone.color}${Math.round(getZoneOpacity(zone.risk) * 255).toString(16).padStart(2, '0')}`}
-            strokeColor={zone.color}
-            strokeWidth={2}
-            tappable
-            onPress={() => handleZonePress(zone)}
-          />
+        {mapReady && filteredZones.map((zone) => (
+          zone.coordinates && zone.coordinates.length > 0 ? (
+            <Polygon
+              key={zone.id}
+              coordinates={zone.coordinates}
+              holes={[]}
+              fillColor={`${zone.color}${Math.round(getZoneOpacity(zone.risk) * 255).toString(16).padStart(2, '0')}`}
+              strokeColor={zone.color}
+              strokeWidth={2}
+              tappable
+              onPress={() => handleZonePress(zone)}
+            />
+          ) : null
         ))}
 
         {/* Zone Markers */}
-        {filteredZones.map((zone) => (
-          <Marker
-            key={`marker-${zone.id}`}
-            coordinate={zone.center}
-            onPress={() => handleZonePress(zone)}
-          >
-            <View style={[styles.markerContainer, { borderColor: zone.color }]}>
-              <View style={[styles.markerDot, { backgroundColor: zone.color }]} />
-              <Text style={styles.markerBadge}>{zone.incidentCount}</Text>
-            </View>
-          </Marker>
+        {mapReady && filteredZones.map((zone) => (
+          zone.center ? (
+            <Marker
+              key={`marker-${zone.id}`}
+              coordinate={zone.center}
+              onPress={() => handleZonePress(zone)}
+            >
+              <View style={[styles.markerContainer, { borderColor: zone.color }]}>
+                <View style={[styles.markerDot, { backgroundColor: zone.color }]} />
+                <Text style={styles.markerBadge}>{zone.incidentCount}</Text>
+              </View>
+            </Marker>
+          ) : null
         ))}
 
         {/* Safe Route Polyline */}
-        {(showRoute || activeFilter === 'routes') && (
+        {mapReady && (showRoute || activeFilter === 'routes') && safeRouteCoordinates && (
           <Polyline
             coordinates={safeRouteCoordinates}
             strokeColor={colors.accent}

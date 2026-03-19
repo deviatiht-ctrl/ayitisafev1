@@ -21,6 +21,10 @@ export const useCamouflageStore = create(
 
 // Main app store
 export const useAppStore = create((set) => ({
+  // App flow state machine
+  appFlowState: 'splash',
+  setAppFlowState: (state) => set({ appFlowState: state }),
+
   // Camouflage
   isCamouflageActive: false,
   setIsCamouflageActive: (active) => set({ isCamouflageActive: active }),
