@@ -9,14 +9,59 @@ import {
   Image,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useLanguageStore } from '../../store/languageStore';
-import { languageNames, languageFlags } from '../../i18n/translations';
 import { colors, fonts } from '../../theme';
 
+// Modern Flag Icons
+const FlagIcon = ({ code }) => {
+  const flagStyles = {
+    ht: { colors: ['#00209F', '#D21034'], icon: 'flag', secondaryColor: '#FFF' },
+    fr: { colors: ['#002395', '#ED2939'], icon: 'flag', secondaryColor: '#FFF' },
+    en: { colors: ['#3C3B6E', '#B22234'], icon: 'flag', secondaryColor: '#FFF' },
+  };
+  
+  const flag = flagStyles[code] || flagStyles.en;
+  
+  return (
+    <View style={flagIconStyles.container}>
+      <LinearGradient
+        colors={flag.colors}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={flagIconStyles.gradient}
+      >
+        <Text style={flagIconStyles.code}>{code.toUpperCase()}</Text>
+      </LinearGradient>
+    </View>
+  );
+};
+
+const flagIconStyles = StyleSheet.create({
+  container: {
+    width: 48,
+    height: 48,
+    borderRadius: 12,
+    overflow: 'hidden',
+    marginRight: 14,
+  },
+  gradient: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  code: {
+    fontFamily: fonts.bold,
+    fontSize: 14,
+    color: '#FFFFFF',
+    letterSpacing: 1,
+  },
+});
+
 const LANGUAGES = [
-  { code: 'ht', name: 'Kreyòl Ayisyen', flag: '🇭🇹', subtitle: 'Lang prensipal' },
-  { code: 'fr', name: 'Français', flag: '🇫🇷', subtitle: 'French' },
-  { code: 'en', name: 'English', flag: '🇺🇸', subtitle: 'American English' },
+  { code: 'ht', name: 'Kreyòl Ayisyen', subtitle: 'Lang prensipal', icon: 'globe' },
+  { code: 'fr', name: 'Français', subtitle: 'French', icon: 'globe' },
+  { code: 'en', name: 'English', subtitle: 'American English', icon: 'globe' },
 ];
 
 export default function LanguageSelectionScreen({ onComplete }) {
@@ -59,7 +104,7 @@ export default function LanguageSelectionScreen({ onComplete }) {
               onPress={() => setSelected(lang.code)}
               activeOpacity={0.7}
             >
-              <Text style={styles.flag}>{lang.flag}</Text>
+              <FlagIcon code={lang.code} />
               <View style={styles.langInfo}>
                 <Text style={[
                   styles.langName,

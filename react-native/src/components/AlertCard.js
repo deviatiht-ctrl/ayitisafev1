@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Image, Modal, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, fonts, spacing, borderRadius } from '../theme';
 
@@ -29,6 +29,15 @@ const severityLabels = {
 export default function AlertCard({ alert, onViewOnMap, onShare, style }) {
   const sev = severityColors[alert.severity] || severityColors.warning;
   const icon = typeIcons[alert.type] || 'alert-circle';
+  const [showPhotoModal, setShowPhotoModal] = useState(false);
+  const [selectedPhoto, setSelectedPhoto] = useState(null);
+
+  const hasPhotos = alert.photos && alert.photos.length > 0;
+
+  const openPhoto = (photo) => {
+    setSelectedPhoto(photo);
+    setShowPhotoModal(true);
+  };
 
   return (
     <View style={[styles.card, { backgroundColor: sev.bg, borderLeftColor: sev.border }, style]}>
@@ -60,6 +69,26 @@ export default function AlertCard({ alert, onViewOnMap, onShare, style }) {
             </View>
           </View>
 
+          {/* Photos Section */}
+          {hasPhotos && (
+            <View style={styles.photosRow}>
+              {alert.photos.slice(0, 3).map((photo, index) => (
+                <TouchableOpacity key={index} onPress={() => openPhoto(photo)}>
+                  <Image source={{ uri: photo }} style={styles.photoThumb} />
+                </TouchableOpacity>
+              ))}
+              {alert.photos.length > 3 && (
+                <View style={styles.morePhotos}>
+                  <Text style={styles.morePhotosText}>+{alert.photos.length - 3}</Text>
+                </View>
+              )}
+              <View style={styles.photosBadge}>
+                <Ionicons name="camera" size={10} color="#FFF" />
+                <Text style={styles.photosBadgeText}>{alert.photos.length}</Text>
+              </View>
+            </View>
+          )}
+
           {/* Actions */}
           <View style={styles.actions}>
             <TouchableOpacity style={styles.actionBtn} onPress={onViewOnMap} activeOpacity={0.7}>
@@ -73,6 +102,44 @@ export default function AlertCard({ alert, onViewOnMap, onShare, style }) {
           </View>
         </View>
       </View>
+
+      {/* Photo Modal */}
+      <Modal visible={showPhotoModal} transparent animationType="fade">
+        <View style={styles.modalOverlay}>
+          <TouchableOpacity 
+            style={styles.closeModalBtn} 
+            onPress={() => setShowPhotoModal(false)}
+          >
+            <Ionicons name="close-circle" size={36} color="#FFF" />
+          </TouchableOpacity>
+          {selectedPhoto && (
+            <Image 
+              source={{ uri: selectedPhoto }} 
+              style={styles.fullPhoto} 
+              resizeMode="contain"
+            />
+          )}
+          {hasPhotos && (
+            <ScrollView 
+              horizontal 
+              style={styles.photoStrip}
+              showsHorizontalScrollIndicator={false}
+            >
+              {alert.photos.map((photo, index) => (
+                <TouchableOpacity key={index} onPress={() => setSelectedPhoto(photo)}>
+                  <Image 
+                    source={{ uri: photo }} 
+                    style={[
+                      styles.stripThumb,
+                      selectedPhoto === photo && styles.stripThumbActive
+                    ]} 
+                  />
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          )}
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -169,5 +236,79 @@ const styles = StyleSheet.create({
     fontFamily: fonts.medium,
     fontSize: 11,
     color: colors.primary,
+  },
+  photosRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: spacing.md,
+    position: 'relative',
+  },
+  photoThumb: {
+    width: 50,
+    height: 50,
+    borderRadius: 8,
+  },
+  morePhotos: {
+    width: 50,
+    height: 50,
+    borderRadius: 8,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  morePhotosText: {
+    fontFamily: fonts.bold,
+    fontSize: 14,
+    color: '#FFF',
+  },
+  photosBadge: {
+    position: 'absolute',
+    top: -6,
+    right: -6,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
+    backgroundColor: colors.accent,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 10,
+  },
+  photosBadgeText: {
+    fontFamily: fonts.bold,
+    fontSize: 10,
+    color: '#FFF',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.9)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  closeModalBtn: {
+    position: 'absolute',
+    top: 50,
+    right: 20,
+    zIndex: 10,
+  },
+  fullPhoto: {
+    width: '90%',
+    height: '60%',
+  },
+  photoStrip: {
+    position: 'absolute',
+    bottom: 40,
+    paddingHorizontal: 20,
+  },
+  stripThumb: {
+    width: 60,
+    height: 60,
+    borderRadius: 8,
+    marginRight: 10,
+    borderWidth: 2,
+    borderColor: 'transparent',
+  },
+  stripThumbActive: {
+    borderColor: colors.accent,
   },
 });

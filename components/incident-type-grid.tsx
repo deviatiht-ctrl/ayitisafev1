@@ -1,28 +1,28 @@
 'use client'
 
 import { 
-  Crosshair, 
-  UserX, 
-  Car, 
-  Construction, 
-  Users, 
-  AlertTriangle, 
-  Droplets,
-  Flame,
-  HelpCircle
+  Target,
+  UserRoundX,
+  CarFront,
+  TrafficCone,
+  UsersRound,
+  AlertTriangle,
+  Waves,
+  FlameKindling,
+  BadgeHelp
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const incidentTypes = [
-  { id: 'shooting', icon: Crosshair, label: 'Tire', color: '#EF4444' },
-  { id: 'kidnapping', icon: UserX, label: 'Kidnapping', color: '#1B2A4A' },
-  { id: 'accident', icon: Car, label: 'Aksidan', color: '#F97316' },
-  { id: 'barricade', icon: Construction, label: 'Barikad', color: '#F59E0B' },
-  { id: 'protest', icon: Users, label: 'Manifestasyon', color: '#8B5CF6' },
+  { id: 'shooting', icon: Target, label: 'Tire', color: '#EF4444' },
+  { id: 'kidnapping', icon: UserRoundX, label: 'Kidnapping', color: '#1B2A4A' },
+  { id: 'accident', icon: CarFront, label: 'Aksidan', color: '#F97316' },
+  { id: 'barricade', icon: TrafficCone, label: 'Barikad', color: '#F59E0B' },
+  { id: 'protest', icon: UsersRound, label: 'Manifestasyon', color: '#8B5CF6' },
   { id: 'road_hazard', icon: AlertTriangle, label: 'Wout Danjere', color: '#F59E0B' },
-  { id: 'flood', icon: Droplets, label: 'Inondasyon', color: '#3B82F6' },
-  { id: 'fire', icon: Flame, label: 'Dife', color: '#EF4444' },
-  { id: 'other', icon: HelpCircle, label: 'Lòt', color: '#6B7280' },
+  { id: 'flood', icon: Waves, label: 'Inondasyon', color: '#3B82F6' },
+  { id: 'fire', icon: FlameKindling, label: 'Dife', color: '#EF4444' },
+  { id: 'other', icon: BadgeHelp, label: 'Lòt', color: '#6B7280' },
 ]
 
 interface IncidentTypeGridProps {
@@ -64,3 +64,4 @@ export function IncidentTypeGrid({ selectedType, onSelect }: IncidentTypeGridPro
     </div>
   )
 }
+

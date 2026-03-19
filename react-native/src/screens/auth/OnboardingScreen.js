@@ -31,7 +31,7 @@ const SLIDES = [
     illustration: <IllustrationAlert />,
     title: 'Resevwa Alèt Imedyat',
     body: 'IA nou an avèti ou otomatikman lè gen tire, barikad, oswa aksidan nan wout ou pral pran an.',
-    chips: ['⚡ Tan Reyèl', '🤖 IA', '📍 Pre Ou'],
+    chips: ['Tan Reyèl', 'IA', 'Pre Ou'],
   },
   {
     id: '3',

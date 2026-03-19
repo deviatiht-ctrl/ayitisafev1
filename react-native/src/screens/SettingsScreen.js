@@ -4,6 +4,7 @@ import {
   SafeAreaView, StatusBar, Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAppStore } from '../store/appStore';
 import { useCamouflageStore } from '../store/appStore';
@@ -12,12 +13,12 @@ import { useTranslation } from '../i18n/useTranslation';
 import { colors, fonts } from '../theme';
 
 const LANGUAGES = [
-  { key: 'ht', label: 'Kreyòl', flag: '🇭🇹' },
-  { key: 'fr', label: 'Français', flag: '🇫🇷' },
-  { key: 'en', label: 'English', flag: '🇺🇸' },
+  { key: 'ht', label: 'Kreyòl', colors: ['#00209F', '#D21034'] },
+  { key: 'fr', label: 'Français', colors: ['#002395', '#ED2939'] },
+  { key: 'en', label: 'English', colors: ['#3C3B6E', '#B22234'] },
 ];
 
-export default function SettingsScreen() {
+export default function SettingsScreen({ navigation }) {
   const setAppFlowState = useAppStore((s) => s.setAppFlowState);
   const { isActive: camouflageActive, setActive: setCamouflageActive } = useCamouflageStore();
   const { darkMode, setDarkMode } = useAppStore();
@@ -27,12 +28,12 @@ export default function SettingsScreen() {
   const handleToggleCamouflage = () => {
     if (!camouflageActive) {
       Alert.alert(
-        'Aktive Kamouflaj',
-        'App la ap parèt tankou yon kalkilatris. Antre PIN ou pou dezaktive li.',
+        t('activateCamouflage'),
+        t('camouflageDesc'),
         [
-          { text: 'Anile', style: 'cancel' },
+          { text: t('cancel'), style: 'cancel' },
           {
-            text: 'Aktive',
+            text: t('activate'),
             onPress: () => {
               setCamouflageActive(true);
               setAppFlowState('calculator');
@@ -44,10 +45,10 @@ export default function SettingsScreen() {
   };
 
   const handleLogout = async () => {
-    Alert.alert('Dekonekte', 'Ou vle dekonekte?', [
-      { text: 'Anile', style: 'cancel' },
+    Alert.alert(t('logout'), t('logoutConfirm'), [
+      { text: t('cancel'), style: 'cancel' },
       {
-        text: 'Wi',
+        text: t('yes'),
         style: 'destructive',
         onPress: async () => {
           await AsyncStorage.removeItem('userToken');
@@ -76,12 +77,12 @@ export default function SettingsScreen() {
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" />
       <ScrollView contentContainerStyle={styles.scroll}>
-        <Text style={styles.title}>Paramèt</Text>
+        <Text style={styles.title}>{t('settings')}</Text>
 
         <View style={styles.section}>
-          <Text style={styles.sectionLabel}>Jeneral</Text>
+          <Text style={styles.sectionLabel}>{t('general')}</Text>
           <View style={styles.card}>
-            <Text style={styles.label}>Lang</Text>
+            <Text style={styles.label}>{t('language')}</Text>
             <View style={styles.langRow}>
               {LANGUAGES.map((l) => (
                 <TouchableOpacity
@@ -89,8 +90,16 @@ export default function SettingsScreen() {
                   style={[styles.langBtn, language === l.key && styles.langBtnActive]}
                   onPress={() => setLanguage(l.key)}
                 >
+                  <LinearGradient
+                    colors={l.colors}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                    style={styles.langIcon}
+                  >
+                    <Text style={styles.langCode}>{l.key.toUpperCase()}</Text>
+                  </LinearGradient>
                   <Text style={[styles.langText, language === l.key && styles.langTextActive]}>
-                    {l.flag} {l.label}
+                    {l.label}
                   </Text>
                 </TouchableOpacity>
               ))}
@@ -98,7 +107,7 @@ export default function SettingsScreen() {
 
             <SettingRow
               icon={darkMode ? 'moon' : 'sunny'}
-              label={darkMode ? 'Mòd Fènwa' : 'Mòd Klè'}
+              label={darkMode ? t('darkModeOn') : t('darkModeOff')}
               onPress={() => setDarkMode(!darkMode)}
               right={
                 <TouchableOpacity
@@ -113,13 +122,21 @@ export default function SettingsScreen() {
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionLabel}>Sekirite</Text>
+          <Text style={styles.sectionLabel}>{t('security')}</Text>
           <View style={styles.card}>
-            <SettingRow icon="notifications" label="Notifikasyon" onPress={() => {}} />
-            <SettingRow icon="people" label="Kontak Dijans" onPress={() => {}} />
+            <SettingRow 
+              icon="notifications" 
+              label={t('notifications')} 
+              onPress={() => navigation.navigate('Notifications')} 
+            />
+            <SettingRow 
+              icon="people" 
+              label={t('emergencyContacts')} 
+              onPress={() => navigation.navigate('EmergencyContacts')} 
+            />
             <SettingRow
               icon="eye-off"
-              label="Mòd Kamouflaj"
+              label={t('camouflageMode')}
               onPress={handleToggleCamouflage}
               right={
                 <TouchableOpacity
@@ -130,16 +147,33 @@ export default function SettingsScreen() {
                 </TouchableOpacity>
               }
             />
-            <SettingRow icon="shield-checkmark" label="Pwivasi" onPress={() => {}} />
+            <SettingRow 
+              icon="shield-checkmark" 
+              label={t('privacy')} 
+              onPress={() => navigation.navigate('Privacy')} 
+            />
           </View>
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionLabel}>Kont</Text>
+          <Text style={styles.sectionLabel}>{t('account')}</Text>
           <View style={styles.card}>
-            <SettingRow icon="information-circle" label="Konsènan AyitiSafe" onPress={() => {}} />
-            <SettingRow icon="help-circle" label="Èd & Sipò" onPress={() => {}} />
-            <SettingRow icon="log-out" label="Dekonekte" onPress={handleLogout} danger />
+            <SettingRow 
+              icon="information-circle" 
+              label={t('aboutApp')} 
+              onPress={() => navigation.navigate('About')} 
+            />
+            <SettingRow 
+              icon="help-circle" 
+              label={t('helpSupport')} 
+              onPress={() => navigation.navigate('Help')} 
+            />
+            <SettingRow 
+              icon="log-out" 
+              label={t('logout')} 
+              onPress={handleLogout} 
+              danger 
+            />
           </View>
         </View>
 
@@ -161,14 +195,18 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.06, shadowRadius: 8, elevation: 2,
   },
   label: { fontFamily: fonts.medium, fontSize: 13, color: colors.primary, marginBottom: 8 },
-  langRow: { flexDirection: 'row', gap: 8, marginBottom: 16 },
+  langRow: { flexDirection: 'row', gap: 10, marginBottom: 16 },
   langBtn: {
-    flex: 1, paddingVertical: 8, borderRadius: 10, backgroundColor: '#F4F6F9',
-    alignItems: 'center',
+    flex: 1, paddingVertical: 10, paddingHorizontal: 8, borderRadius: 12, backgroundColor: '#F4F6F9',
+    alignItems: 'center', borderWidth: 2, borderColor: 'transparent',
   },
-  langBtnActive: { backgroundColor: colors.accent },
-  langText: { fontFamily: fonts.medium, fontSize: 13, color: '#64748B' },
-  langTextActive: { color: '#FFF' },
+  langBtnActive: { backgroundColor: '#FFF7ED', borderColor: colors.accent },
+  langIcon: {
+    width: 32, height: 32, borderRadius: 8, justifyContent: 'center', alignItems: 'center', marginBottom: 6,
+  },
+  langCode: { fontFamily: fonts.bold, fontSize: 10, color: '#FFF', letterSpacing: 0.5 },
+  langText: { fontFamily: fonts.medium, fontSize: 11, color: '#64748B' },
+  langTextActive: { color: colors.accent, fontFamily: fonts.semiBold },
   settingRow: {
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
     paddingVertical: 14, borderTopWidth: 1, borderTopColor: '#F4F6F9',

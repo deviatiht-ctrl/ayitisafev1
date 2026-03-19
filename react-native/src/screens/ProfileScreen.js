@@ -1,42 +1,62 @@
 import React, { useState, useEffect } from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity, ScrollView,
-  SafeAreaView, StatusBar, Image,
+  SafeAreaView, StatusBar, Image, Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAppStore } from '../store/appStore';
+import { useTranslation } from '../i18n/useTranslation';
 import { colors, fonts } from '../theme';
 
-const MENU_ITEMS = [
-  { icon: 'person-circle', label: 'Modifye Pwofil', screen: 'EditProfile' },
-  { icon: 'shield-checkmark', label: 'Nivo Sekirite', screen: 'SecurityLevel' },
-  { icon: 'people', label: 'Kontak Dijans', screen: 'EmergencyContacts' },
-  { icon: 'document-text', label: 'Rapò Mwen yo', screen: 'MyReports' },
-  { icon: 'stats-chart', label: 'Estatis', screen: 'Stats' },
-];
-
 export default function ProfileScreen({ navigation }) {
+  const { t } = useTranslation();
   const setAppFlowState = useAppStore((s) => s.setAppFlowState);
   const [profile, setProfile] = useState({ name: 'Itilizatè', phone: '+509 XXXX-XXXX' });
 
+  const MENU_ITEMS = [
+    { icon: 'person-circle', label: t('editProfile'), screen: 'EditProfile' },
+    { icon: 'people', label: t('emergencyContacts'), screen: 'EmergencyContacts' },
+    { icon: 'document-text', label: t('myReports'), screen: 'MyReports' },
+    { icon: 'stats-chart', label: t('statistics'), screen: 'Stats' },
+    { icon: 'settings', label: t('settings'), screen: 'Settings' },
+  ];
+
   useEffect(() => {
+    loadProfile();
+  }, []);
+
+  useEffect(() => {
+    const unsubscribe = navigation?.addListener?.('focus', loadProfile);
+    return unsubscribe;
+  }, [navigation]);
+
+  const loadProfile = () => {
     AsyncStorage.getItem('userProfile').then((data) => {
       if (data) setProfile(JSON.parse(data));
     });
-  }, []);
+  };
 
   const handleLogout = async () => {
-    await AsyncStorage.removeItem('userToken');
-    await AsyncStorage.removeItem('guestMode');
-    setAppFlowState('auth');
+    Alert.alert(t('logout'), t('logoutConfirm'), [
+      { text: t('cancel'), style: 'cancel' },
+      {
+        text: t('yes'),
+        style: 'destructive',
+        onPress: async () => {
+          await AsyncStorage.removeItem('userToken');
+          await AsyncStorage.removeItem('guestMode');
+          setAppFlowState('auth');
+        },
+      },
+    ]);
   };
 
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" />
       <ScrollView contentContainerStyle={styles.scroll}>
-        <Text style={styles.title}>Pwofil</Text>
+        <Text style={styles.title}>{t('profile')}</Text>
 
         {/* Avatar card */}
         <View style={styles.avatarCard}>
@@ -47,7 +67,10 @@ export default function ProfileScreen({ navigation }) {
             <Text style={styles.userName}>{profile.name}</Text>
             <Text style={styles.userPhone}>{profile.phone}</Text>
           </View>
-          <TouchableOpacity style={styles.editBtn}>
+          <TouchableOpacity 
+            style={styles.editBtn}
+            onPress={() => navigation.navigate('EditProfile')}
+          >
             <Ionicons name="pencil" size={16} color={colors.accent} />
           </TouchableOpacity>
         </View>
@@ -57,8 +80,8 @@ export default function ProfileScreen({ navigation }) {
           <View style={styles.securityLeft}>
             <Ionicons name="shield-checkmark" size={24} color={colors.safe} />
             <View>
-              <Text style={styles.securityTitle}>Nivo Sekirite</Text>
-              <Text style={styles.securityValue}>Bon — 78/100</Text>
+              <Text style={styles.securityTitle}>{t('securityLevel')}</Text>
+              <Text style={styles.securityValue}>{t('good')} — 78/100</Text>
             </View>
           </View>
           <View style={styles.progressBarBg}>
@@ -69,7 +92,11 @@ export default function ProfileScreen({ navigation }) {
         {/* Menu items */}
         <View style={styles.menuCard}>
           {MENU_ITEMS.map((item, i) => (
-            <TouchableOpacity key={i} style={[styles.menuRow, i > 0 && styles.menuRowBorder]}>
+            <TouchableOpacity 
+              key={i} 
+              style={[styles.menuRow, i > 0 && styles.menuRowBorder]}
+              onPress={() => navigation.navigate(item.screen)}
+            >
               <View style={styles.menuLeft}>
                 <Ionicons name={item.icon} size={22} color={colors.primary} />
                 <Text style={styles.menuLabel}>{item.label}</Text>
@@ -82,17 +109,17 @@ export default function ProfileScreen({ navigation }) {
         {/* Admin access */}
         <TouchableOpacity
           style={styles.adminBtn}
-          onPress={() => navigation?.navigate?.('AdminDashboard')}
+          onPress={() => navigation.navigate('AdminDashboard')}
           activeOpacity={0.7}
         >
           <Ionicons name="analytics" size={20} color={colors.accent} />
-          <Text style={styles.adminText}>Tablo Bò Admin</Text>
+          <Text style={styles.adminText}>{t('adminDashboard')}</Text>
         </TouchableOpacity>
 
         {/* Logout */}
         <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout}>
           <Ionicons name="log-out" size={20} color={colors.danger} />
-          <Text style={styles.logoutText}>Dekonekte</Text>
+          <Text style={styles.logoutText}>{t('logout')}</Text>
         </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>

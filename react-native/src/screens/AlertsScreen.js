@@ -7,25 +7,28 @@ import {
   TouchableOpacity,
   RefreshControl,
   SafeAreaView,
+  Share,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, fonts, spacing, borderRadius } from '../theme';
 import { alerts } from '../data/mockData';
 import AlertCard from '../components/AlertCard';
 import FilterChips from '../components/FilterChips';
-
-const filterChips = [
-  { id: 'all', label: 'Tout' },
-  { id: 'critical', label: 'Kritik', color: colors.danger },
-  { id: 'warning', label: 'Atansyon', color: colors.warning },
-  { id: 'nearby', label: 'Pre m' },
-  { id: 'resolved', label: 'Rezoud', color: colors.safe },
-];
+import { useTranslation } from '../i18n/useTranslation';
 
 export default function AlertsScreen({ navigation }) {
+  const { t } = useTranslation();
   const [activeFilter, setActiveFilter] = useState('all');
   const [refreshing, setRefreshing] = useState(false);
   const [lastUpdated] = useState(new Date());
+
+  const filterChips = [
+    { id: 'all', label: t('all') },
+    { id: 'critical', label: t('critical'), color: colors.danger },
+    { id: 'warning', label: t('warning'), color: colors.warning },
+    { id: 'nearby', label: t('nearby') },
+    { id: 'resolved', label: t('resolved'), color: colors.safe },
+  ];
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
@@ -51,8 +54,14 @@ export default function AlertsScreen({ navigation }) {
     navigation.navigate('Map', { focusLocation: alert.location });
   };
 
-  const handleShare = (alert) => {
-    // Implement share functionality
+  const handleShare = async (alert) => {
+    try {
+      await Share.share({
+        message: `[ALÈT] AyitiSafe: ${alert.title}\nKote: ${alert.location}\n${alert.description}\n\nTelechaje AyitiSafe pou rete enfòme!`,
+      });
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -60,7 +69,7 @@ export default function AlertsScreen({ navigation }) {
       {/* Header */}
       <View style={styles.header}>
         <View style={styles.headerTop}>
-          <Text style={styles.title}>Sant Alèt</Text>
+          <Text style={styles.title}>{t('alertCenter')}</Text>
           <TouchableOpacity onPress={onRefresh} style={styles.refreshButton}>
             <Ionicons 
               name="refresh" 
@@ -74,7 +83,7 @@ export default function AlertsScreen({ navigation }) {
         <View style={styles.lastUpdated}>
           <Ionicons name="time-outline" size={14} color={colors.textLight} />
           <Text style={styles.lastUpdatedText}>
-            Dènye aktyalizasyon: {lastUpdated.toLocaleTimeString('fr-FR', {
+            {t('lastUpdated')}: {lastUpdated.toLocaleTimeString('fr-FR', {
               hour: '2-digit',
               minute: '2-digit',
             })}
@@ -110,7 +119,7 @@ export default function AlertsScreen({ navigation }) {
         )}
         ListEmptyComponent={
           <View style={styles.emptyState}>
-            <Text style={styles.emptyText}>Pa gen alèt nan kategori sa a</Text>
+            <Text style={styles.emptyText}>{t('noAlertsCategory')}</Text>
           </View>
         }
       />

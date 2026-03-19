@@ -34,12 +34,12 @@ export default function SuccessModal({ visible, name, onDismiss }) {
             <Ionicons name="checkmark" size={40} color="#FFFFFF" />
           </Animated.View>
 
-          <Text style={styles.title}>Byenveni nan AyitiSafe! 🎉</Text>
+          <Text style={styles.title}>Byenveni nan AyitiSafe!</Text>
           <Text style={styles.subtitle}>Kont ou kreye avèk siksè.</Text>
 
           <View style={styles.tipCard}>
             <Text style={styles.tipText}>
-              💡 Konsèy: Toujou verifye zòn avan ou vwayaje nan Port-au-Prince ak nan lòt vil yo.
+              Konsèy: Toujou verifye zòn avan ou vwayaje nan Port-au-Prince ak nan lòt vil yo.
             </Text>
           </View>
 

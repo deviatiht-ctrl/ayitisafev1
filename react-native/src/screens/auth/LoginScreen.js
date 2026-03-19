@@ -77,7 +77,7 @@ export default function LoginScreen({ navigation, onLoginSuccess, onGuest }) {
 
           {/* Form Card */}
           <View style={styles.card}>
-            <Text style={styles.cardTitle}>Bon Retou 👋</Text>
+            <Text style={styles.cardTitle}>Bon Retou</Text>
             <Text style={styles.cardSub}>Antre enfòmasyon ou yo</Text>
 
             {errors.general && (
